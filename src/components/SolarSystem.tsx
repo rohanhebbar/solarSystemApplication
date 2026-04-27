@@ -4,11 +4,12 @@ import { Vector3 } from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import Sun from "./Sun";
 import Planet from "./Planet";
-import OrbitRing from "./OrbitRing";
+import OrbitPath from "./OrbitPath";
 import { planets, sunData } from "../data/planets";
 import { useCameraFly } from "../hooks/useCameraFly";
 import { useThree } from "@react-three/fiber";
-import type { ViewMode, ScenePanApi, PanDirection } from "../types";
+import type { ViewMode, ScenePanApi, PanDirection, OrbitModel } from "../types";
+import { getBodyPosition } from "../lib/orbitMath";
 
 const OVERVIEW_POS = new Vector3(40, 55, 95);
 const OVERVIEW_LOOK = new Vector3(40, 0, 0);
@@ -20,6 +21,8 @@ interface SolarSystemProps {
   selectedPlanet: string | null;
   onSelectPlanet: (name: string | null) => void;
   viewMode: ViewMode;
+  orbitModel: OrbitModel;
+  orbitTime: number;
   panApiRef: RefObject<ScenePanApi | null>;
   onOrbitControlsReady?: () => void;
 }
@@ -28,6 +31,8 @@ export default function SolarSystem({
   selectedPlanet,
   onSelectPlanet,
   viewMode,
+  orbitModel,
+  orbitTime,
   panApiRef,
   onOrbitControlsReady,
 }: SolarSystemProps) {
@@ -35,14 +40,19 @@ export default function SolarSystem({
   const { flyTo, isAnimating } = useCameraFly(controlsRef);
   const { camera } = useThree();
   const prevSelectedRef = useRef<string | null>(null);
+  const orbitTimeRef = useRef(orbitTime);
   const overviewSnapshotRef = useRef<{
     position: Vector3;
     target: Vector3;
   } | null>(null);
 
   useEffect(() => {
+    orbitTimeRef.current = orbitTime;
+  }, [orbitTime]);
+
+  useEffect(() => {
     overviewSnapshotRef.current = null;
-  }, [viewMode]);
+  }, [viewMode, orbitModel]);
 
   useEffect(() => {
     const overviewPosition = getOverviewPosition(viewMode);
@@ -89,13 +99,18 @@ export default function SolarSystem({
           : planets.find((p) => p.name === selectedPlanet);
       if (body) {
         const offset = body.displayRadius * 4 + 2;
-        const bodyDistance = getSceneDistance(body, viewMode);
-        const target = new Vector3(
-          bodyDistance + offset * 0.3,
-          offset * 0.5,
-          offset * 0.8
+        const bodyPosition = getBodyPosition(
+          body,
+          viewMode,
+          orbitTimeRef.current,
+          orbitModel
         );
-        const look = new Vector3(bodyDistance, 0, 0);
+        const target = new Vector3(
+          bodyPosition.x + offset * 0.3,
+          bodyPosition.y + offset * 0.5,
+          bodyPosition.z + offset * 0.8
+        );
+        const look = bodyPosition.clone();
         flyTo(target, look);
       }
     } else {
@@ -108,7 +123,7 @@ export default function SolarSystem({
     }
 
     prevSelectedRef.current = selectedPlanet;
-  }, [selectedPlanet, flyTo, isAnimating, viewMode, camera]);
+  }, [selectedPlanet, flyTo, isAnimating, viewMode, orbitModel, camera]);
 
   const shiftHorizontal = useCallback(
     (dir: PanDirection) => {
@@ -188,10 +203,10 @@ export default function SolarSystem({
 
       {planets.map((p) => (
         <group key={p.name}>
-          <OrbitRing distance={getSceneDistance(p, viewMode)} />
+          <OrbitPath body={p} viewMode={viewMode} orbitModel={orbitModel} />
           <Planet
             data={p}
-            distance={getSceneDistance(p, viewMode)}
+            position={getBodyPosition(p, viewMode, orbitTime, orbitModel)}
             isSelected={selectedPlanet === p.name}
             anySelected={selectedPlanet !== null}
             onSelect={handleSelect}
@@ -214,15 +229,6 @@ export default function SolarSystem({
       />
     </>
   );
-}
-
-function getSceneDistance(
-  body: { displayDistance: number; distanceFromSun: number },
-  viewMode: ViewMode
-) {
-  return viewMode === "distance"
-    ? body.distanceFromSun * AU_SCALE
-    : body.displayDistance;
 }
 
 function getOverviewPosition(viewMode: ViewMode) {

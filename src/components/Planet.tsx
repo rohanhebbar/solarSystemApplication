@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 import { Html, useTexture } from "@react-three/drei";
 import type { Mesh } from "three";
+import type { Vector3 } from "three";
 import { DoubleSide, SRGBColorSpace } from "three";
 import type { Texture } from "three";
 import type { PlanetData } from "../data/planets";
@@ -10,7 +11,7 @@ import { PLANET_VISUALS } from "../data/planetTextures";
 
 interface PlanetProps {
   data: PlanetData;
-  distance: number;
+  position: Vector3;
   isSelected: boolean;
   anySelected: boolean;
   onSelect: (name: string) => void;
@@ -30,7 +31,7 @@ export default function Planet(props: PlanetProps) {
 
 function PlanetColored({
   data,
-  distance,
+  position,
   isSelected,
   anySelected,
   onSelect,
@@ -52,7 +53,7 @@ function PlanetColored({
   const emissiveIntensity = hovered ? 0.4 : isSelected ? 0.25 : 0;
 
   return (
-    <group position={[distance, 0, 0]}>
+    <group position={position}>
       <mesh
         ref={meshRef}
         onClick={(e: ThreeEvent<MouseEvent>) => {
@@ -111,29 +112,11 @@ function PlanetColored({
         </mesh>
       )}
 
-      {!anySelected && (
-        <Html
-          position={[0, data.displayRadius + 0.6, 0]}
-          center
-          style={{
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          <div
-            style={{
-              color: hovered ? "#ffffff" : "rgba(255,255,255,0.7)",
-              fontSize: hovered ? "14px" : "12px",
-              fontWeight: hovered ? 600 : 400,
-              fontFamily: "Inter, system-ui, sans-serif",
-              whiteSpace: "nowrap",
-              textShadow: "0 0 8px rgba(0,0,0,0.8)",
-              transition: "all 0.2s ease",
-            }}
-          >
-            {data.name}
-          </div>
-        </Html>
+      {!anySelected && hovered && (
+        <PlanetLabel
+          name={data.name}
+          yOffset={data.displayRadius + Math.max(1.1, data.displayRadius * 0.75)}
+        />
       )}
     </group>
   );
@@ -141,7 +124,7 @@ function PlanetColored({
 
 function PlanetTextured({
   data,
-  distance,
+  position,
   isSelected,
   anySelected,
   onSelect,
@@ -201,7 +184,7 @@ function PlanetTextured({
   };
 
   return (
-    <group position={[distance, 0, 0]}>
+    <group position={position}>
       <mesh
         ref={meshRef}
         {...meshHandlers}
@@ -270,30 +253,50 @@ function PlanetTextured({
         </mesh>
       )}
 
-      {!anySelected && (
-        <Html
-          position={[0, data.displayRadius + 0.6, 0]}
-          center
-          style={{
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          <div
-            style={{
-              color: hovered ? "#ffffff" : "rgba(255,255,255,0.7)",
-              fontSize: hovered ? "14px" : "12px",
-              fontWeight: hovered ? 600 : 400,
-              fontFamily: "Inter, system-ui, sans-serif",
-              whiteSpace: "nowrap",
-              textShadow: "0 0 8px rgba(0,0,0,0.8)",
-              transition: "all 0.2s ease",
-            }}
-          >
-            {data.name}
-          </div>
-        </Html>
+      {!anySelected && hovered && (
+        <PlanetLabel
+          name={data.name}
+          yOffset={data.displayRadius + Math.max(1.1, data.displayRadius * 0.75)}
+        />
       )}
     </group>
+  );
+}
+
+function PlanetLabel({
+  name,
+  yOffset,
+}: {
+  name: string;
+  yOffset: number;
+}) {
+  return (
+    <Html
+      position={[0, yOffset, 0]}
+      center
+      style={{
+        pointerEvents: "none",
+        userSelect: "none",
+      }}
+    >
+      <div
+        style={{
+          color: "#f8fafc",
+          fontSize: "12px",
+          fontWeight: 600,
+          fontFamily: "Inter, system-ui, sans-serif",
+          whiteSpace: "nowrap",
+          padding: "6px 10px",
+          borderRadius: "999px",
+          background: "rgba(8, 10, 18, 0.82)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(8px)",
+          textShadow: "0 0 8px rgba(0,0,0,0.65)",
+          boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+        }}
+      >
+        {name}
+      </div>
+    </Html>
   );
 }

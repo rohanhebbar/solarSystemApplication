@@ -1,12 +1,20 @@
 import { useState, useEffect, type RefObject } from "react";
 import { planets, sunData } from "../data/planets";
-import type { ViewMode, ScenePanApi } from "../types";
+import type { ViewMode, ScenePanApi, OrbitSpeed, OrbitModel } from "../types";
 
 interface HUDProps {
   selectedPlanet: string | null;
   onSelectPlanet: (name: string | null) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
+  orbitModel: OrbitModel;
+  onOrbitModelChange: (model: OrbitModel) => void;
+  isOrbitPlaying: boolean;
+  orbitSpeed: OrbitSpeed;
+  onStartOrbit: () => void;
+  onPauseOrbit: () => void;
+  onResetOrbit: () => void;
+  onOrbitSpeedChange: (speed: OrbitSpeed) => void;
   panApiRef: RefObject<ScenePanApi | null>;
   orbitReadyTick: number;
 }
@@ -16,6 +24,14 @@ export default function HUD({
   onSelectPlanet,
   viewMode,
   onViewModeChange,
+  orbitModel,
+  onOrbitModelChange,
+  isOrbitPlaying,
+  orbitSpeed,
+  onStartOrbit,
+  onPauseOrbit,
+  onResetOrbit,
+  onOrbitSpeedChange,
   panApiRef,
   orbitReadyTick,
 }: HUDProps) {
@@ -33,7 +49,7 @@ export default function HUD({
           Solar System Explorer
         </h1>
         <p className="text-xs text-white/35 mt-0.5">
-          Click the Sun or a planet to explore &middot; Scroll to zoom &middot; Drag to orbit
+          Click the Sun or a planet to explore &middot; Hover to label &middot; Scroll to zoom &middot; Drag to orbit
           <span className="block mt-1 text-white/30">
             In overview, use the side arrows to slide along the system (bounded)
           </span>
@@ -59,6 +75,58 @@ export default function HUD({
           active={viewMode === "distance"}
           onClick={() => onViewModeChange("distance")}
         />
+      </div>
+
+      <div
+        className="fixed left-6 z-10 flex items-center gap-1 p-1 rounded-full"
+        style={{
+          top: "6.5rem",
+          background: "rgba(8, 10, 18, 0.7)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <ModeButton
+          label="Simple orbits"
+          active={orbitModel === "simple"}
+          onClick={() => onOrbitModelChange("simple")}
+        />
+        <ModeButton
+          label="Realistic orbits"
+          active={orbitModel === "realistic"}
+          onClick={() => onOrbitModelChange("realistic")}
+        />
+      </div>
+
+      <div
+        className="fixed left-6 z-10 flex items-center gap-1 p-1 rounded-full"
+        style={{
+          top: "10.25rem",
+          background: "rgba(8, 10, 18, 0.7)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
+        <ModeButton
+          label={isOrbitPlaying ? "Running" : "Start"}
+          active={isOrbitPlaying}
+          onClick={onStartOrbit}
+        />
+        <ModeButton
+          label="Pause"
+          active={!isOrbitPlaying}
+          onClick={onPauseOrbit}
+        />
+        <ModeButton label="Reset" active={false} onClick={onResetOrbit} />
+        <div className="w-px h-5 bg-white/15 mx-1" />
+        {[1, 10, 50].map((speed) => (
+          <ModeButton
+            key={speed}
+            label={`${speed}x`}
+            active={orbitSpeed === speed}
+            onClick={() => onOrbitSpeedChange(speed as OrbitSpeed)}
+          />
+        ))}
       </div>
 
       {!selectedPlanet && (

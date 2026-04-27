@@ -17,6 +17,9 @@ export interface PlanetData {
   color: string;
   emissiveColor?: string;
   orbitalPeriod: number; // Earth days
+  initialPhase?: number; // radians, mean anomaly at t=0
+  eccentricity?: number; // 0 = circle
+  inclinationDeg?: number; // degrees to ecliptic
   rotationPeriod: number; // hours
   tilt: number; // axial tilt degrees
   facts: string[];
@@ -44,6 +47,9 @@ export const planets: PlanetData[] = [
     displayRadius: scaleRadius(2439.7),
     color: "#8c7e6d",
     orbitalPeriod: 88,
+    initialPhase: 0.3,
+    eccentricity: 0.206,
+    inclinationDeg: 7.0,
     rotationPeriod: 1407.6,
     tilt: 0.034,
     facts: [
@@ -73,6 +79,9 @@ export const planets: PlanetData[] = [
     displayRadius: scaleRadius(6051.8),
     color: "#e8cda0",
     orbitalPeriod: 224.7,
+    initialPhase: 1.4,
+    eccentricity: 0.007,
+    inclinationDeg: 3.4,
     rotationPeriod: -5832.5,
     tilt: 177.4,
     facts: [
@@ -102,6 +111,9 @@ export const planets: PlanetData[] = [
     displayRadius: scaleRadius(6371),
     color: "#4a90d9",
     orbitalPeriod: 365.25,
+    initialPhase: 2.2,
+    eccentricity: 0.017,
+    inclinationDeg: 0,
     rotationPeriod: 23.93,
     tilt: 23.44,
     facts: [
@@ -131,6 +143,9 @@ export const planets: PlanetData[] = [
     displayRadius: scaleRadius(3389.5),
     color: "#c1440e",
     orbitalPeriod: 687,
+    initialPhase: 0.95,
+    eccentricity: 0.093,
+    inclinationDeg: 1.85,
     rotationPeriod: 24.62,
     tilt: 25.19,
     facts: [
@@ -160,6 +175,9 @@ export const planets: PlanetData[] = [
     displayRadius: scaleRadius(69911),
     color: "#c88b3a",
     orbitalPeriod: 4331,
+    initialPhase: 2.85,
+    eccentricity: 0.049,
+    inclinationDeg: 1.3,
     rotationPeriod: 9.93,
     tilt: 3.13,
     facts: [
@@ -190,6 +208,9 @@ export const planets: PlanetData[] = [
     color: "#d4a94b",
     emissiveColor: "#2a2010",
     orbitalPeriod: 10747,
+    initialPhase: 1.75,
+    eccentricity: 0.057,
+    inclinationDeg: 2.49,
     rotationPeriod: 10.7,
     tilt: 26.73,
     hasRings: true,
@@ -221,6 +242,9 @@ export const planets: PlanetData[] = [
     displayRadius: scaleRadius(25362),
     color: "#7ec8e3",
     orbitalPeriod: 30589,
+    initialPhase: 0.62,
+    eccentricity: 0.046,
+    inclinationDeg: 0.77,
     rotationPeriod: -17.24,
     tilt: 97.77,
     hasRings: true,
@@ -252,6 +276,9 @@ export const planets: PlanetData[] = [
     displayRadius: scaleRadius(24622),
     color: "#3454b4",
     orbitalPeriod: 59800,
+    initialPhase: 2.48,
+    eccentricity: 0.011,
+    inclinationDeg: 1.77,
     rotationPeriod: 16.11,
     tilt: 28.32,
     facts: [

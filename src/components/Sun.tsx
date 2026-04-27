@@ -1,4 +1,4 @@
-import { Suspense, useRef, useLayoutEffect } from "react";
+import { Suspense, useRef, useLayoutEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 import { Html, useTexture } from "@react-three/drei";
@@ -23,6 +23,7 @@ export default function Sun(props: SunProps) {
 
 function SunColored({ isSelected, anySelected, onSelect }: SunProps) {
   const meshRef = useRef<Mesh>(null);
+  const [hovered, setHovered] = useState(false);
 
   useFrame((_state, delta) => {
     if (meshRef.current) {
@@ -48,9 +49,11 @@ function SunColored({ isSelected, anySelected, onSelect }: SunProps) {
         }}
         onPointerOver={(e: ThreeEvent<PointerEvent>) => {
           e.stopPropagation();
+          setHovered(true);
           document.body.style.cursor = "pointer";
         }}
         onPointerOut={() => {
+          setHovered(false);
           document.body.style.cursor = "auto";
         }}
       >
@@ -79,28 +82,8 @@ function SunColored({ isSelected, anySelected, onSelect }: SunProps) {
           opacity={0.03}
         />
       </mesh>
-      {!anySelected && (
-        <Html
-          position={[0, sunData.displayRadius + 0.8, 0]}
-          center
-          style={{
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          <div
-            style={{
-              color: "rgba(255,255,255,0.85)",
-              fontSize: "13px",
-              fontWeight: 600,
-              fontFamily: "Inter, system-ui, sans-serif",
-              whiteSpace: "nowrap",
-              textShadow: "0 0 10px rgba(0,0,0,0.9)",
-            }}
-          >
-            Sun
-          </div>
-        </Html>
+      {!anySelected && hovered && (
+        <SunLabel yOffset={sunData.displayRadius + 4.1} />
       )}
     </group>
   );
@@ -108,6 +91,7 @@ function SunColored({ isSelected, anySelected, onSelect }: SunProps) {
 
 function SunTextured({ isSelected, anySelected, onSelect }: SunProps) {
   const meshRef = useRef<Mesh>(null);
+  const [hovered, setHovered] = useState(false);
   const map = useTexture(SUN_TEXTURE_MAP);
 
   useLayoutEffect(() => {
@@ -139,9 +123,11 @@ function SunTextured({ isSelected, anySelected, onSelect }: SunProps) {
         }}
         onPointerOver={(e: ThreeEvent<PointerEvent>) => {
           e.stopPropagation();
+          setHovered(true);
           document.body.style.cursor = "pointer";
         }}
         onPointerOut={() => {
+          setHovered(false);
           document.body.style.cursor = "auto";
         }}
       >
@@ -171,29 +157,38 @@ function SunTextured({ isSelected, anySelected, onSelect }: SunProps) {
           opacity={0.04}
         />
       </mesh>
-      {!anySelected && (
-        <Html
-          position={[0, sunData.displayRadius + 0.8, 0]}
-          center
-          style={{
-            pointerEvents: "none",
-            userSelect: "none",
-          }}
-        >
-          <div
-            style={{
-              color: "rgba(255,255,255,0.85)",
-              fontSize: "13px",
-              fontWeight: 600,
-              fontFamily: "Inter, system-ui, sans-serif",
-              whiteSpace: "nowrap",
-              textShadow: "0 0 10px rgba(0,0,0,0.9)",
-            }}
-          >
-            Sun
-          </div>
-        </Html>
-      )}
+      {!anySelected && hovered && <SunLabel yOffset={sunData.displayRadius + 4.1} />}
     </group>
+  );
+}
+
+function SunLabel({ yOffset }: { yOffset: number }) {
+  return (
+    <Html
+      position={[0, yOffset, 0]}
+      center
+      style={{
+        pointerEvents: "none",
+        userSelect: "none",
+      }}
+    >
+      <div
+        style={{
+          color: "#fff7ed",
+          fontSize: "12px",
+          fontWeight: 600,
+          fontFamily: "Inter, system-ui, sans-serif",
+          whiteSpace: "nowrap",
+          padding: "6px 10px",
+          borderRadius: "999px",
+          background: "rgba(18, 12, 8, 0.82)",
+          border: "1px solid rgba(255,190,120,0.18)",
+          backdropFilter: "blur(8px)",
+          textShadow: "0 0 8px rgba(0,0,0,0.65)",
+        }}
+      >
+        Sun
+      </div>
+    </Html>
   );
 }
