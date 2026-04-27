@@ -34,6 +34,15 @@ export default function SolarSystem({
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const { flyTo, isAnimating } = useCameraFly(controlsRef);
   const { camera } = useThree();
+  const prevSelectedRef = useRef<string | null>(null);
+  const overviewSnapshotRef = useRef<{
+    position: Vector3;
+    target: Vector3;
+  } | null>(null);
+
+  useEffect(() => {
+    overviewSnapshotRef.current = null;
+  }, [viewMode]);
 
   useEffect(() => {
     const overviewPosition = getOverviewPosition(viewMode);
@@ -59,7 +68,19 @@ export default function SolarSystem({
   );
 
   useEffect(() => {
-    if (isAnimating()) return;
+    const prev = prevSelectedRef.current;
+
+    if (prev === null && selectedPlanet !== null && controlsRef.current) {
+      overviewSnapshotRef.current = {
+        position: camera.position.clone(),
+        target: controlsRef.current.target.clone(),
+      };
+    }
+
+    if (isAnimating()) {
+      prevSelectedRef.current = selectedPlanet;
+      return;
+    }
 
     if (selectedPlanet) {
       const body =
@@ -78,9 +99,16 @@ export default function SolarSystem({
         flyTo(target, look);
       }
     } else {
-      flyTo(getOverviewPosition(viewMode), getOverviewLook(viewMode));
+      const snap = overviewSnapshotRef.current;
+      if (snap) {
+        flyTo(snap.position.clone(), snap.target.clone());
+      } else {
+        flyTo(getOverviewPosition(viewMode), getOverviewLook(viewMode));
+      }
     }
-  }, [selectedPlanet, flyTo, isAnimating, viewMode]);
+
+    prevSelectedRef.current = selectedPlanet;
+  }, [selectedPlanet, flyTo, isAnimating, viewMode, camera]);
 
   const shiftHorizontal = useCallback(
     (dir: PanDirection) => {
