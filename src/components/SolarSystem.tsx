@@ -1,6 +1,7 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { Stars, OrbitControls } from "@react-three/drei";
 import { Vector3 } from "three";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import Sun from "./Sun";
 import Planet from "./Planet";
 import OrbitRing from "./OrbitRing";
@@ -20,12 +21,17 @@ export default function SolarSystem({
   selectedPlanet,
   onSelectPlanet,
 }: SolarSystemProps) {
-  const { flyTo, isAnimating } = useCameraFly();
+  const controlsRef = useRef<OrbitControlsImpl>(null);
+  const { flyTo, isAnimating } = useCameraFly(controlsRef);
   const { camera } = useThree();
 
   useEffect(() => {
     camera.position.copy(OVERVIEW_POS);
     camera.lookAt(OVERVIEW_LOOK);
+    if (controlsRef.current) {
+      controlsRef.current.target.copy(OVERVIEW_LOOK);
+      controlsRef.current.update();
+    }
   }, [camera]);
 
   const handleSelect = useCallback(
@@ -87,14 +93,17 @@ export default function SolarSystem({
       ))}
 
       <OrbitControls
-        enablePan
+        ref={controlsRef}
+        makeDefault
+        enablePan={false}
         enableZoom
         enableRotate
-        minDistance={3}
-        maxDistance={200}
+        minDistance={2}
+        maxDistance={250}
         enableDamping
-        dampingFactor={0.05}
-        zoomSpeed={0.8}
+        dampingFactor={0.08}
+        zoomSpeed={0.6}
+        rotateSpeed={0.5}
       />
     </>
   );
