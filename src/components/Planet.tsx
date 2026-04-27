@@ -7,12 +7,19 @@ import type { PlanetData } from "../data/planets";
 
 interface PlanetProps {
   data: PlanetData;
+  distance: number;
   isSelected: boolean;
   anySelected: boolean;
   onSelect: (name: string) => void;
 }
 
-export default function Planet({ data, isSelected, anySelected, onSelect }: PlanetProps) {
+export default function Planet({
+  data,
+  distance,
+  isSelected,
+  anySelected,
+  onSelect,
+}: PlanetProps) {
   const meshRef = useRef<Mesh>(null);
   const ringRef = useRef<Mesh>(null);
   const [hovered, setHovered] = useState(false);
@@ -30,7 +37,7 @@ export default function Planet({ data, isSelected, anySelected, onSelect }: Plan
   const emissiveIntensity = hovered ? 0.4 : isSelected ? 0.25 : 0;
 
   return (
-    <group position={[data.displayDistance, 0, 0]}>
+    <group position={[distance, 0, 0]}>
       <mesh
         ref={meshRef}
         onClick={(e) => {

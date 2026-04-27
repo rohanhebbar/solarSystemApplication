@@ -275,12 +275,33 @@ export const planets: PlanetData[] = [
   },
 ];
 
-export const sunData = {
+export const sunData: PlanetData = {
   name: "Sun",
   radius: 695508,
+  distanceFromSun: 0,
+  displayDistance: 0,
   displayRadius: 4,
   color: "#FDB813",
   emissiveColor: "#ff8800",
+  orbitalPeriod: 0,
+  rotationPeriod: 609.12,
+  tilt: 7.25,
+  facts: [
+    "The Sun contains about 99.86% of all the mass in the solar system.",
+    "Every second, its core fuses roughly 600 million tons of hydrogen into helium.",
+    "Light from the Sun takes about 8 minutes and 20 seconds to reach Earth.",
+    "The Sun's visible surface, the photosphere, is about 5,500°C, while the core reaches about 15 million°C.",
+    "Solar wind streams outward from the Sun and helps shape the vast bubble around our solar system called the heliosphere.",
+  ],
+  stats: {
+    mass: "1.99 × 10³⁰ kg",
+    gravity: "274 m/s²",
+    avgTemp: "5,500°C surface",
+    atmosphere: "Plasma: mostly hydrogen and helium",
+    moons: 0,
+    dayLength: "25-35 Earth days",
+    yearLength: "~230 million years around the galaxy",
+  },
   description:
     "The Sun is a G-type main-sequence star containing 99.86% of the mass of the entire solar system. Its core fuses 600 million tons of hydrogen into helium every second, producing the light and heat that make life on Earth possible.",
 };

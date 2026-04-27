@@ -6,6 +6,8 @@ interface InfoPanelProps {
 }
 
 export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
+  const isSun = planet?.name === "Sun";
+
   return (
     <div
       className={`fixed top-0 right-0 h-full w-[380px] z-20 transition-transform duration-500 ease-out ${
@@ -26,7 +28,9 @@ export default function InfoPanel({ planet, onClose }: InfoPanelProps) {
                 {planet.name}
               </h2>
               <p className="text-sm text-white/50 mt-1">
-                {planet.distanceFromSun} AU from the Sun
+                {isSun
+                  ? "The star at the center of our solar system"
+                  : `${planet.distanceFromSun} AU from the Sun`}
               </p>
             </div>
             <button
